@@ -1,3 +1,35 @@
+/******************************************************************************
+Copyright (c) Microsoft Corporation.
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.
+***************************************************************************** */
+/* global Reflect, Promise, SuppressedError, Symbol, Iterator */
+
+
+function __spreadArray(to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+}
+
+typeof SuppressedError === "function" ? SuppressedError : function (error, suppressed, message) {
+    var e = new Error(message);
+    return e.name = "SuppressedError", e.error = error, e.suppressed = suppressed, e;
+};
+
 /**
  * @fileoverview
  *
@@ -74,7 +106,7 @@
 /**
  * Represents a rectangular area within the packer.
  */
-class Bin {
+var Bin = /** @class */ (function () {
     /**
      * Creates a new Bin instance.
      * @param id Unique identifier for the bin.
@@ -86,7 +118,10 @@ class Bin {
      * @param maxh Maximum height the bin can occupy.
      * @param refcount The number of references to this bin.
      */
-    constructor(id, x, y, w, h, maxw = w, maxh = h, refcount = 0) {
+    function Bin(id, x, y, w, h, maxw, maxh, refcount) {
+        if (maxw === void 0) { maxw = w; }
+        if (maxh === void 0) { maxh = h; }
+        if (refcount === void 0) { refcount = 0; }
         this.id = id;
         this.x = x;
         this.y = y;
@@ -96,11 +131,12 @@ class Bin {
         this.maxh = maxh;
         this.refcount = refcount;
     }
-}
+    return Bin;
+}());
 /**
  * Represents a horizontal row within the packer where bins can be placed.
  */
-class Shelf {
+var Shelf = /** @class */ (function () {
     /**
      * Creates a new Shelf instance.
      * @param y Top coordinate of the shelf.
@@ -108,7 +144,8 @@ class Shelf {
      * @param height Height of the shelf.
      * @param x The initial X position on the shelf
      */
-    constructor(y, width, height, x = 0) {
+    function Shelf(y, width, height, x) {
+        if (x === void 0) { x = 0; }
         this.y = y;
         this.w = width;
         this.h = height;
@@ -122,36 +159,39 @@ class Shelf {
      * @param id Unique identifier for the bin.
      * @returns The allocated Bin, or null if allocation failed.
      */
-    alloc(w, h, id) {
+    Shelf.prototype.alloc = function (w, h, id) {
         if (w > this.free || h > this.h) {
             return null;
         }
-        const x = this.x;
+        var x = this.x;
         this.x += w;
         this.free -= w;
         return new Bin(id, x, this.y, w, h, w, this.h);
-    }
+    };
     /**
      * Resizes the shelf to a new width.
      * @param w The new width of the shelf.
      */
-    resize(w) {
+    Shelf.prototype.resize = function (w) {
         this.free += w - this.w;
         this.w = w;
-    }
-}
+    };
+    return Shelf;
+}());
 /**
  * A bin packing algorithm that uses the Shelf Best Height Fit strategy.
  */
-class ShelfPack {
+var ShelfPack = /** @class */ (function () {
     /**
      * Creates a new ShelfPack instance.
      * @param width Initial width of the packer.
      * @param height Initial height of the packer.
      * @param options Optional configuration options.
      */
-    constructor(width = 64, height = 64, options) {
-        const opts = options !== null && options !== void 0 ? options : {};
+    function ShelfPack(width, height, options) {
+        if (width === void 0) { width = 64; }
+        if (height === void 0) { height = 64; }
+        var opts = options !== null && options !== void 0 ? options : {};
         this.autoResize = !!opts.autoResize;
         this.shelves = [];
         this.freebins = [];
@@ -168,21 +208,22 @@ class ShelfPack {
      * @param options.inPlace If true, modifies the input `bins` array in-place, adding `x`, `y`, and `id` properties to each bin.
      * @returns An array of packed Bins.
      */
-    pack(bins, options = {}) {
-        const binsCopy = [...bins];
-        const results = [];
-        for (let i = 0; i < binsCopy.length; i++) {
-            const w = binsCopy[i].w || binsCopy[i].w;
-            const h = binsCopy[i].h || binsCopy[i].h;
-            const id = binsCopy[i].id;
+    ShelfPack.prototype.pack = function (bins, options) {
+        if (options === void 0) { options = {}; }
+        var binsCopy = __spreadArray([], bins, true);
+        var results = [];
+        for (var i = 0; i < binsCopy.length; i++) {
+            var w = binsCopy[i].w || binsCopy[i].w;
+            var h = binsCopy[i].h || binsCopy[i].h;
+            var id = binsCopy[i].id;
             if (typeof w === 'number' && typeof h === 'number') {
-                const allocation = this.packOne(w, h, id);
+                var allocation = this.packOne(w, h, id);
                 if (!allocation) {
                     continue;
                 }
                 if (options.inPlace) {
                     if ('x' in binsCopy[i] && 'y' in binsCopy[i]) {
-                        const bin = bins[i];
+                        var bin = bins[i];
                         bin.x = allocation.x;
                         bin.y = allocation.y;
                         bin.id = allocation.id;
@@ -193,7 +234,7 @@ class ShelfPack {
         }
         this.shrink();
         return results;
-    }
+    };
     /**
      * Packs a single bin into the packer.
      * @param w Width of the bin to pack.
@@ -201,18 +242,18 @@ class ShelfPack {
      * @param id Optional unique identifier for the bin. If not provided, a new ID will be generated.
      * @returns The packed Bin, or null if the bin could not be packed.
      */
-    packOne(w, h, id) {
-        const best = {
+    ShelfPack.prototype.packOne = function (w, h, id) {
+        var best = {
             freebin: -1,
             shelf: -1,
             waste: Infinity,
         };
-        let y = 0;
-        let bin;
-        let shelf;
-        let waste;
-        let i;
-        let finalId;
+        var y = 0;
+        var bin;
+        var shelf;
+        var waste;
+        var i;
+        var finalId;
         // If id was supplied, attempt a lookup..
         if (typeof id === 'string' || typeof id === 'number') {
             bin = this.getBin(id);
@@ -289,7 +330,7 @@ class ShelfPack {
         //  * if sprite dimensions are equal, grow width before height
         //  * accommodate very large bin requests (big `w` or `h`)
         if (this.autoResize) {
-            let h1, h2, w1, w2;
+            var h1 = void 0, h2 = void 0, w1 = void 0, w2 = void 0;
             h1 = h2 = this.h;
             w1 = w2 = this.w;
             if (w1 <= h1 || w > w1) {
@@ -304,7 +345,7 @@ class ShelfPack {
             return this.packOne(w, h, finalId); // Retry.
         }
         return null;
-    }
+    };
     /**
      * Allocates a bin by reusing an existing free bin.
      * @param index The index of the free bin in the `freebins` array.
@@ -313,13 +354,13 @@ class ShelfPack {
      * @param id The unique identifier for the bin.
      * @returns The allocated Bin.
      */
-    allocFreebin(index, w, h, id) {
-        const bin = this.freebins.splice(index, 1)[0];
-        const newBin = new Bin(id, bin.x, bin.y, w, h, bin.maxw, bin.maxh, 0);
+    ShelfPack.prototype.allocFreebin = function (index, w, h, id) {
+        var bin = this.freebins.splice(index, 1)[0];
+        var newBin = new Bin(id, bin.x, bin.y, w, h, bin.maxw, bin.maxh, 0);
         this.bins[id] = newBin;
         this.ref(newBin);
         return newBin;
-    }
+    };
     /**
      * Allocates a bin on an existing shelf.
      * @param index The index of the shelf in the `shelves` array.
@@ -328,54 +369,54 @@ class ShelfPack {
      * @param id The unique identifier for the bin.
      * @returns The allocated Bin.
      */
-    allocShelf(index, w, h, id) {
-        const shelf = this.shelves[index];
-        const bin = shelf.alloc(w, h, id);
+    ShelfPack.prototype.allocShelf = function (index, w, h, id) {
+        var shelf = this.shelves[index];
+        var bin = shelf.alloc(w, h, id);
         if (bin === null) {
             throw new Error('Failed to allocate bin on shelf.');
         }
         this.bins[id] = bin;
         this.ref(bin);
         return bin;
-    }
+    };
     /**
      * Shrinks the width/height of the sprite to the bare minimum.
      * Since shelf-pack doubles first width, then height when running out of shelf space
      * this can result in fairly large unused space both in width and height if that happens
      * towards the end of bin packing.
      */
-    shrink() {
+    ShelfPack.prototype.shrink = function () {
         if (this.shelves.length > 0) {
-            let w2 = 0;
-            let h2 = 0;
-            for (let j = 0; j < this.shelves.length; j++) {
-                const shelf = this.shelves[j];
+            var w2 = 0;
+            var h2 = 0;
+            for (var j = 0; j < this.shelves.length; j++) {
+                var shelf = this.shelves[j];
                 h2 += shelf.h;
                 w2 = Math.max(shelf.w - shelf.free, w2);
             }
             this.resize(w2, h2);
         }
-    }
+    };
     /**
      * Retrieves a packed bin by its ID.
      * @param id The unique identifier of the bin.
      * @returns The Bin, or undefined if no bin with the given ID is found.
      */
-    getBin(id) {
+    ShelfPack.prototype.getBin = function (id) {
         return this.bins[id];
-    }
+    };
     /**
      * Increments the reference count of a bin.
      * @param bin The bin to increment the reference count of.
      * @returns The new reference count of the bin.
      */
-    ref(bin) {
+    ShelfPack.prototype.ref = function (bin) {
         if (++bin.refcount === 1) {
             // A new Bin.. record height in stats histogram..
             this.stats[bin.h] = (this.stats[bin.h] | 0) + 1;
         }
         return bin.refcount;
-    }
+    };
     /**
      * Decrements the reference count of a bin.
      * If the reference count reaches 0, the bin is added to the `freebins` list
@@ -383,7 +424,7 @@ class ShelfPack {
      * @param bin The bin to decrement the reference count of.
      * @returns The new reference count of the bin.
      */
-    unref(bin) {
+    ShelfPack.prototype.unref = function (bin) {
         if (bin.refcount === 0) {
             return 0;
         }
@@ -393,31 +434,32 @@ class ShelfPack {
             this.freebins.push(bin);
         }
         return bin.refcount;
-    }
+    };
     /**
      * Clears the packer, removing all bins and shelves.
      */
-    clear() {
+    ShelfPack.prototype.clear = function () {
         this.shelves = [];
         this.freebins = [];
         this.stats = {};
         this.bins = {};
         this.maxId = 0;
-    }
+    };
     /**
      * Resizes the packer to the given dimensions.
      * @param w The new width of the packer.
      * @param h The new height of the packer.
      * @returns True if the resize was successful, false otherwise.
      */
-    resize(w, h) {
+    ShelfPack.prototype.resize = function (w, h) {
         this.w = w;
         this.h = h;
-        for (let i = 0; i < this.shelves.length; i++) {
+        for (var i = 0; i < this.shelves.length; i++) {
             this.shelves[i].resize(w);
         }
         return true;
-    }
-}
+    };
+    return ShelfPack;
+}());
 
 export { ShelfPack as default };
