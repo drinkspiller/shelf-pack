@@ -3,7 +3,7 @@
   "description": "A 2D rectangular bin packing data structure that uses the Shelf Best Height Fit heuristic",
   "version": "3.2.0",
   "main": "index.js",
-  "module": "index.mjs",
+  "module": "index.ts",
   "license": "ISC",
   "author": "Bryan Housel <bryan@mapbox.com>",
   "repository": "mapbox/shelf-pack",
@@ -12,22 +12,37 @@
     "sprite"
   ],
   "devDependencies": {
-    "benchmark": "^2.1.0",
+    "@rollup/plugin-commonjs": "^28.0.2",
+    "@rollup/plugin-node-resolve": "^16.0.0",
+    "@rollup/plugin-typescript": "^12.1.2",
+    "@types/node": "^22.7.5",
+    "benchmark": "^2.1.4",
     "bin-pack": "1.0.2",
-    "coveralls": "^3.0.2",
-    "documentation": "^9.1.1",
-    "eslint": "^5.11.0",
-    "rollup": "^0.68.2",
-    "tap": "^12.1.0"
+    "coveralls": "^3.1.1",
+    "documentation": "^14.0.3",
+    "eslint": "^9.17.0",
+    "gts": "^6.0.2",
+    "nodemon": "^3.1.9",
+    "rollup": "^4.29.1",
+    "rollup-plugin-copy": "^3.5.0",
+    "tap": "^21.0.1",
+    "tslib": "^2.8.1",
+    "typescript": "^5.6.3"
   },
   "engines": {
     "node": ">=6.0.0"
   },
   "scripts": {
     "bench": "npm run build && node bench/bench.js",
-    "build": "rollup -f umd -n ShelfPack index.mjs --no-indent --no-strict -o index.js",
-    "docs": "documentation build index.mjs --github --format html --output docs/",
-    "lint": "eslint index.mjs test/ bench/",
-    "test": "npm run build && npm run lint && tap --cov test/*.js"
+    "build": " npx rollup -c rollup.config.mjs",
+    "newBuild": "rollup -f es -o dist/index.mjs src/index.ts",
+    "lint": "gts lint",
+    "test": "npm run build && npm run lint && tap --cov test/*.js",
+    "clean": "gts clean",
+    "compile": "tsc",
+    "fix": "gts fix",
+    "prepare": "npm run compile",
+    "pretest": "npm run compile",
+    "posttest": "npm run lint"
   }
 }
