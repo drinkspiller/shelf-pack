@@ -1,12 +1,27 @@
 {
-  "name": "@mapbox/shelf-pack",
-  "description": "A 2D rectangular bin packing data structure that uses the Shelf Best Height Fit heuristic",
+  "name": "@drinkspiller/shelf-pack-ts",
+  "description": "A 2D rectangular bin packing data structure that uses the Shelf Best Height Fit heuristic. TypeScript fork of @mapbox/shelf-pack.",
   "version": "3.2.0",
   "main": "index.js",
-  "module": "index.ts",
+  "module": "dist/shelf-pack.esm.js",
+  "types": "dist/index.d.ts",
   "license": "ISC",
-  "author": "Bryan Housel <bryan@mapbox.com>",
-  "repository": "mapbox/shelf-pack",
+  "author": {
+    "name": "Bryan Housel",
+    "email": "bryan@mapbox.com",
+    "url": "https://github.com/bhousel"
+  },
+  "contributors": [
+    {
+      "name": "Skye Giordano",
+      "url": "https://github.com/drinkspiller"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/drinkspiller/shelf-pack.git",
+    "directory": "Forked from: https://github.com/mapbox/shelf-pack"
+  },
   "keywords": [
     "bin packing",
     "sprite"
