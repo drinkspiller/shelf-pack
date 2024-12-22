@@ -63,5 +63,8 @@
     "predev": "rm -rf dist/*",
     "pretest": "npm run compile",
     "posttest": "npm run lint"
-  }
+  },
+  "files": [
+    "dist"
+  ]
 }
