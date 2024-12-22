@@ -2,7 +2,6 @@
   "name": "@drinkspiller/shelf-pack-ts",
   "description": "A 2D rectangular bin packing data structure that uses the Shelf Best Height Fit heuristic. TypeScript fork of @mapbox/shelf-pack.",
   "version": "3.2.0",
-  "main": "index.js",
   "module": "dist/shelf-pack.esm.js",
   "types": "dist/index.d.ts",
   "license": "ISC",
@@ -52,8 +51,9 @@
   },
   "scripts": {
     "bench": "npm run build && node bench/bench.js",
-    "build": "npx rollup -c rollup.config.mjs",
+    "build": "npm run generate-types; npx rollup -c rollup.config.mjs",
     "dev": "npx nodemon rollup -c rollup.config.mjs",
+    "generate-types": "npx tsc --emitDeclarationOnly --outDir dist --declaration true src/index.ts",
     "lint": "npx eslint .",
     "fix": "npx eslint . --fix",
     "test": "npm run build && npm run lint && tap --cov test/*.js",
