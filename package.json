@@ -29,6 +29,7 @@
   "devDependencies": {
     "@rollup/plugin-commonjs": "^28.0.2",
     "@rollup/plugin-node-resolve": "^16.0.0",
+    "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^12.1.2",
     "@types/node": "^22.7.5",
     "benchmark": "^2.1.4",
@@ -49,14 +50,16 @@
   },
   "scripts": {
     "bench": "npm run build && node bench/bench.js",
-    "build": " npx rollup -c rollup.config.mjs",
-    "newBuild": "rollup -f es -o dist/index.mjs src/index.ts",
+    "build": "npx rollup -c rollup.config.mjs",
+    "dev": "npx nodemon rollup -c rollup.config.mjs",
     "lint": "gts lint",
     "test": "npm run build && npm run lint && tap --cov test/*.js",
     "clean": "gts clean",
     "compile": "tsc",
     "fix": "gts fix",
     "prepare": "npm run compile",
+    "prebuild": "rm -rf dist/*",
+    "predev": "rm -rf dist/*",
     "pretest": "npm run compile",
     "posttest": "npm run lint"
   }

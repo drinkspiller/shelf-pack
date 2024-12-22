@@ -421,4 +421,3 @@ class ShelfPack {
 }
 
 export { ShelfPack as default };
-//# sourceMappingURL=shelf-pack.esm.js.map

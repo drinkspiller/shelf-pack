@@ -429,4 +429,3 @@
     return ShelfPack;
 
 }));
-//# sourceMappingURL=shelf-pack.umd.js.map
