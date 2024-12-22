@@ -19,8 +19,8 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/drinkspiller/shelf-pack.git",
-    "directory": "Forked from: https://github.com/mapbox/shelf-pack"
+    "url": "git+https://github.com/drinkspiller/shelf-pack.git-ts",
+    "directory": "Forked from: https://github.com/mapbox/shelf-pack-ts"
   },
   "keywords": [
     "bin packing",
