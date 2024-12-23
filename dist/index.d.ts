@@ -22,7 +22,7 @@
  *
  * ## Bins
  *  Bins (e.g. 'items', 'elements', 'books') represent an occupied space of a
- * certain size. Each bin has a width (`w`), height (`h`), and a unique
+ * certain size. Each bin has a width (`width`), height (`height`), and a unique
  * identifier (`id`). Think of `this.bins` as a bookshelf with books on it.
  *
  * ## Shelves
@@ -61,7 +61,7 @@
  * 1. Create a ShelfPack instance
  *    `const packer = new ShelfPack(width, height, options);`
  * 2. Pack bins
- *    `packer.pack(bins, options);` or `packer.packOne(w, h, id);`
+ *    `packer.pack(bins, options);` or `packer.packOne(width, height, id);`
  * 3. Retrieve a bin
  *    `packer.getBin(id);`
  * 4. Manage bin references
@@ -74,55 +74,62 @@
 /**
  * Options for configuring the ShelfPack instance.
  */
-interface ShelfPackOptions {
+export interface ShelfPackOptions {
     /**
      * If true, the packer will automatically grow its dimensions to accommodate
      * bins that don't fit.
      */
     autoResize?: boolean;
 }
-interface BinInput {
-    w?: number;
-    h?: number;
-    width?: number;
-    height?: number;
+/**
+ * A single item to be packed into the shelf.
+ * `width` or `w`, and `height` or `h` are required properties.
+ * If `inPlace` is true, then `x`, `y` and `id` properties will be set.
+ */
+export interface InputBinBase {
     id?: string | number;
+    width: number;
+    height: number;
 }
-type InputBin<T extends {
-    inPlace?: boolean;
-}> = T["inPlace"] extends true ? Bin : BinInput;
+export interface InputBinInPlace extends InputBinBase {
+    x: number;
+    y: number;
+}
+export type InputBin<T> = T extends {
+    inPlace: true;
+} ? InputBinInPlace : InputBinBase;
 /**
  * Represents a rectangular area within the packer.
  */
-declare class Bin {
+export declare class Bin {
     id: string | number;
     x: number;
     y: number;
-    w: number;
-    h: number;
-    maxw: number;
-    maxh: number;
+    width: number;
+    height: number;
+    maxwidth: number;
+    maxheight: number;
     refcount: number;
     /**
      * Creates a new Bin instance.
      * @param id Unique identifier for the bin.
      * @param x Left coordinate of the bin.
      * @param y Top coordinate of the bin.
-     * @param w Width of the bin.
-     * @param h Height of the bin.
-     * @param maxw Maximum width the bin can occupy.
-     * @param maxh Maximum height the bin can occupy.
+     * @param width Width of the bin.
+     * @param height Height of the bin.
+     * @param maxwidth Maximum width the bin can occupy.
+     * @param maxheight Maximum height the bin can occupy.
      * @param refcount The number of references to this bin.
      */
-    constructor(id: string | number, x: number, y: number, w: number, h: number, maxw?: number, maxh?: number, refcount?: number);
+    constructor(id: string | number, x: number, y: number, width: number, height: number, maxwidth?: number, maxheight?: number, refcount?: number);
 }
 /**
  * Represents a horizontal row within the packer where bins can be placed.
  */
-declare class Shelf {
+export declare class Shelf {
     y: number;
-    w: number;
-    h: number;
+    width: number;
+    height: number;
     x: number;
     free: number;
     /**
@@ -135,22 +142,22 @@ declare class Shelf {
     constructor(y: number, width: number, height: number, x?: number);
     /**
      * Attempts to allocate a bin on this shelf.
-     * @param w Width of the bin to allocate.
-     * @param h Height of the bin to allocate.
+     * @param width Width of the bin to allocate.
+     * @param height Height of the bin to allocate.
      * @param id Unique identifier for the bin.
      * @returns The allocated Bin, or null if allocation failed.
      */
-    alloc(w: number, h: number, id: string | number): Bin | null;
+    allocateBin(width: number, height: number, id: string | number): Bin | null;
     /**
      * Resizes the shelf to a new width.
-     * @param w The new width of the shelf.
+     * @param width The new width of the shelf.
      */
-    resize(w: number): void;
+    resize(width: number): void;
 }
 /**
  * A bin packing algorithm that uses the Shelf Best Height Fit strategy.
  */
-declare class ShelfPack {
+export declare class ShelfPack {
     /**
      * If true, the packer will automatically grow its dimensions to accommodate
      * bins that don't fit.
@@ -179,11 +186,11 @@ declare class ShelfPack {
     /**
      * The current width of the packer
      */
-    w: number;
+    width: number;
     /**
      * The current height of the packer
      */
-    h: number;
+    height: number;
     /**
      * Creates a new ShelfPack instance.
      * @param width Initial width of the packer.
@@ -193,7 +200,14 @@ declare class ShelfPack {
     constructor(width?: number, height?: number, options?: ShelfPackOptions);
     /**
      * Packs multiple bins into the packer.
-     * @param bins An array of bins to pack. Each bin should have `w` (or `width`) and `h` (or `height`) properties.
+     * @param bins An array of bins to pack. Each bin should have `width` and `height` properties.
+     * @param options Optional parameters.
+     * @param options.inPlace If true, modifies the input `bins` array in-place, adding `x`, `y`, and `id` properties to each bin.
+     * @returns An array of packed Bins.
+     */
+    /**
+     * Packs multiple bins into the packer.
+     * @param bins An array of bins to pack. Each bin should have `width` and `height` properties.
      * @param options Optional parameters.
      * @param options.inPlace If true, modifies the input `bins` array in-place, adding `x`, `y`, and `id` properties to each bin.
      * @returns An array of packed Bins.
@@ -203,26 +217,26 @@ declare class ShelfPack {
     }>(bins: InputBin<T>[], options?: T): Bin[];
     /**
      * Packs a single bin into the packer.
-     * @param w Width of the bin to pack.
-     * @param h Height of the bin to pack.
+     * @param width Width of the bin to pack.
+     * @param height Height of the bin to pack.
      * @param id Optional unique identifier for the bin. If not provided, a new ID will be generated.
      * @returns The packed Bin, or null if the bin could not be packed.
      */
-    packOne(w: number, h: number, id?: string | number): Bin | null;
+    packOne(width: number, height: number, id?: string | number): Bin | null;
     /**
      * Allocates a bin by reusing an existing free bin.
      * @param index The index of the free bin in the `freebins` array.
-     * @param w The width of the bin to allocate.
-     * @param h The height of the bin to allocate.
+     * @param width The width of the bin to allocate.
+     * @param height The height of the bin to allocate.
      * @param id The unique identifier for the bin.
      * @returns The allocated Bin.
      */
-    private allocFreebin;
+    private allocateFreeBin;
     /**
      * Allocates a bin on an existing shelf.
      * @param index The index of the shelf in the `shelves` array.
-     * @param w The width of the bin to allocate.
-     * @param h The height of the bin to allocate.
+     * @param width The width of the bin to allocate.
+     * @param height The height of the bin to allocate.
      * @param id The unique identifier for the bin.
      * @returns The allocated Bin.
      */
@@ -245,7 +259,7 @@ declare class ShelfPack {
      * @param bin The bin to increment the reference count of.
      * @returns The new reference count of the bin.
      */
-    ref(bin: Bin): number;
+    incrementReferenceCount(bin: Bin): number;
     /**
      * Decrements the reference count of a bin.
      * If the reference count reaches 0, the bin is added to the `freebins` list
@@ -253,17 +267,16 @@ declare class ShelfPack {
      * @param bin The bin to decrement the reference count of.
      * @returns The new reference count of the bin.
      */
-    unref(bin: Bin): number;
+    decrementReferenceCount(bin: Bin): number;
     /**
      * Clears the packer, removing all bins and shelves.
      */
     clear(): void;
     /**
      * Resizes the packer to the given dimensions.
-     * @param w The new width of the packer.
-     * @param h The new height of the packer.
+     * @param width The new width of the packer.
+     * @param height The new height of the packer.
      * @returns True if the resize was successful, false otherwise.
      */
-    resize(w: number, h: number): boolean;
+    resize(width: number, height: number): boolean;
 }
-export default ShelfPack;
