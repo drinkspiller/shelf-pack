@@ -83,11 +83,16 @@ export interface ShelfPackOptions {
   autoResize?: boolean;
 }
 
+export interface BinOptions {
+  inPlace?: boolean;
+  shrinkAfterPack?: boolean;
+}
+
 export interface BinInterface {
   id: string | number;
   width: number;
   height: number;
-  options?: { inPlace: boolean };
+  options?: BinOptions;
 }
 
 /**
@@ -251,16 +256,9 @@ export class ShelfPack {
    * @param options.inPlace If true, modifies the input `bins` array in-place, adding `x`, `y`, and `id` properties to each bin.
    * @returns An array of packed Bins.
    */
-  /**
-   * Packs multiple bins into the packer.
-   * @param bins An array of bins to pack. Each bin should have `width` and `height` properties.
-   * @param options Optional parameters.
-   * @param options.inPlace If true, modifies the input `bins` array in-place, adding `x`, `y`, and `id` properties to each bin.
-   * @returns An array of packed Bins.
-   */
-  pack<T extends { inPlace?: boolean }>(
+  pack(
     bins: Bin[],
-    options: T = {} as T,
+    options: BinOptions = { inPlace: false, shrinkAfterPack: true },
   ): Bin[] {
     const updatedBins = bins as Bin[];
 
@@ -291,7 +289,9 @@ export class ShelfPack {
       }
     }
 
-    this.shrink();
+    if (options.shrinkAfterPack) {
+      this.shrink();
+    }
 
     return results;
   }

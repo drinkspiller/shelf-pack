@@ -81,27 +81,20 @@ export interface ShelfPackOptions {
      */
     autoResize?: boolean;
 }
-/**
- * A single item to be packed into the shelf.
- * `width` or `w`, and `height` or `h` are required properties.
- * If `inPlace` is true, then `x`, `y` and `id` properties will be set.
- */
-export interface InputBinBase {
-    id?: string | number;
+export interface BinOptions {
+    inPlace?: boolean;
+    shrinkAfterPack?: boolean;
+}
+export interface BinInterface {
+    id: string | number;
     width: number;
     height: number;
+    options?: BinOptions;
 }
-export interface InputBinInPlace extends InputBinBase {
-    x: number;
-    y: number;
-}
-export type InputBin<T> = T extends {
-    inPlace: true;
-} ? InputBinInPlace : InputBinBase;
 /**
  * Represents a rectangular area within the packer.
  */
-export declare class Bin {
+export declare class Bin implements BinInterface {
     id: string | number;
     x: number;
     y: number;
@@ -205,16 +198,7 @@ export declare class ShelfPack {
      * @param options.inPlace If true, modifies the input `bins` array in-place, adding `x`, `y`, and `id` properties to each bin.
      * @returns An array of packed Bins.
      */
-    /**
-     * Packs multiple bins into the packer.
-     * @param bins An array of bins to pack. Each bin should have `width` and `height` properties.
-     * @param options Optional parameters.
-     * @param options.inPlace If true, modifies the input `bins` array in-place, adding `x`, `y`, and `id` properties to each bin.
-     * @returns An array of packed Bins.
-     */
-    pack<T extends {
-        inPlace?: boolean;
-    }>(bins: InputBin<T>[], options?: T): Bin[];
+    pack(bins: Bin[], options?: BinOptions): Bin[];
     /**
      * Packs a single bin into the packer.
      * @param width Width of the bin to pack.

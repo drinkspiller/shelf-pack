@@ -53,7 +53,7 @@
   "scripts": {
     "bench": "npm run build && node bench/bench.js",
     "build": "npx rollup -c rollup.config.mjs",
-    "dev": "npx rollup -c rollup.config.mjs  --watch --watch.onEnd=\"yalc push --sig --changed\"",
+    "dev": "npx rollup -c rollup.config.mjs  --watch --watch.onEnd=\"yalc push --sig\"",
     "generate-types": "npx tsc --emitDeclarationOnly --outDir dist --declaration true src/index.ts",
     "lint": "npx eslint .",
     "fix": "npx eslint . --fix",

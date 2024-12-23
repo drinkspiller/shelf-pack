@@ -182,15 +182,8 @@
          * @param options.inPlace If true, modifies the input `bins` array in-place, adding `x`, `y`, and `id` properties to each bin.
          * @returns An array of packed Bins.
          */
-        /**
-         * Packs multiple bins into the packer.
-         * @param bins An array of bins to pack. Each bin should have `width` and `height` properties.
-         * @param options Optional parameters.
-         * @param options.inPlace If true, modifies the input `bins` array in-place, adding `x`, `y`, and `id` properties to each bin.
-         * @returns An array of packed Bins.
-         */
         ShelfPack.prototype.pack = function (bins, options) {
-            if (options === void 0) { options = {}; }
+            if (options === void 0) { options = { inPlace: false, shrinkAfterPack: true }; }
             var updatedBins = bins;
             var results = [];
             var width;
@@ -214,7 +207,9 @@
                     results.push(allocation);
                 }
             }
-            this.shrink();
+            if (options.shrinkAfterPack) {
+                this.shrink();
+            }
             return results;
         };
         /**
