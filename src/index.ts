@@ -9,14 +9,14 @@
  *
  * Imagine a ShelfPack instance as managing a physical bookshelf:
  *
- *     - `ShelfPack` instance: entire bookshelf.
- *     - `this.shelves`: The horizontal shelves on the bookshelf.
- *     - `Bin` objects: The rectangular items (e.g., books) being placed on the
+ *   - `ShelfPack` instance: entire bookshelf.
+ *   - `this.shelves`: The horizontal shelves on the bookshelf.
+ *   - `Bin` objects: The rectangular items (e.g., books) being placed on the
  *        shelves.
- *     - `this.freebins`: A box of "available" books that have been removed
- *        from the shelf and can be reused.
- *     - `this.bins`: A record of all the books currently placed on the
- *        bookshelf, and how many times each has been requested.
+ *   - `this.freebins`: Available spots on a shelf where a removed book used to
+ *      be and can be reused.
+ *   - `this.bins`: A record of all the books currently placed on the
+ *      bookshelf, and how many times each has been requested.
  *
  * # Core Concepts:
  *
@@ -99,14 +99,6 @@ export interface BinInterface {
  * Represents a rectangular area within the packer.
  */
 export class Bin implements BinInterface {
-  id: string | number;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  maxwidth: number;
-  maxheight: number;
-  refcount: number;
   /**
    * Creates a new Bin instance.
    * @param id Unique identifier for the bin.
@@ -119,35 +111,21 @@ export class Bin implements BinInterface {
    * @param refcount The number of references to this bin.
    */
   constructor(
-    id: string | number,
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-    maxwidth: number = width,
-    maxheight: number = height,
-    refcount: number = 0,
-  ) {
-    this.id = id;
-    this.x = x;
-    this.y = y;
-    this.width = width;
-    this.height = height;
-    this.maxwidth = maxwidth;
-    this.maxheight = maxheight;
-    this.refcount = refcount;
-  }
+    public id: string | number,
+    public x: number,
+    public y: number,
+    public width: number,
+    public height: number,
+    public maxwidth: number = width,
+    public maxheight: number = height,
+    public refcount: number = 0,
+  ) {}
 }
 
 /**
  * Represents a horizontal row within the packer where bins can be placed.
  */
 export class Shelf {
-  y: number;
-  width: number;
-  height: number;
-  x: number;
-  free: number;
   /**
    * Creates a new Shelf instance.
    * @param y Top coordinate of the shelf.
@@ -155,13 +133,13 @@ export class Shelf {
    * @param height Height of the shelf.
    * @param x The initial X position on the shelf
    */
-  constructor(y: number, width: number, height: number, x: number = 0) {
-    this.y = y;
-    this.width = width;
-    this.height = height;
-    this.x = x;
-    this.free = width;
-  }
+  constructor(
+    public y: number,
+    public width: number,
+    public height: number,
+    public x: number = 0,
+    public free: number = width,
+  ) {}
 
   /**
    * Attempts to allocate a bin on this shelf.
@@ -195,38 +173,10 @@ export class Shelf {
  */
 export class ShelfPack {
   /**
-   * If true, the packer will automatically grow its dimensions to accommodate
-   * bins that don't fit.
-   */
-  autoResize: boolean;
-  /**
-   * The list of shelves in the packer.
-   */
-  shelves: Shelf[];
-  /**
-   * The list of free bins available for reuse.
-   */
-  freebins: Bin[];
-  /**
-   * Statistics about the packed bins.
-   */
-  stats: Record<number, number>;
-  /**
-   * A map of packed bins, indexed by their unique identifiers.
-   */
-  bins: Record<string | number, Bin>;
-  /**
    * The maximum ID used for a bin.
    */
-  maxId: number;
-  /**
-   * The current width of the packer
-   */
-  width: number;
-  /**
-   * The current height of the packer
-   */
-  height: number;
+  public maxId: number;
+
   /**
    * Creates a new ShelfPack instance.
    * @param width Initial width of the packer.
@@ -234,19 +184,17 @@ export class ShelfPack {
    * @param options Optional configuration options.
    */
   constructor(
-    width: number = 64,
-    height: number = 64,
-    options?: ShelfPackOptions,
+    public width: number = 64,
+    public height: number = 64,
+    public options?: ShelfPackOptions,
+    public shelves: Shelf[] = [],
+    public freebins: Bin[] = [],
+    public stats: Record<number, number> = {},
+    public bins: Record<string | number, Bin> = {},
+    public autoResize: boolean = !!options?.autoResize,
+    maxId: number = 0,
   ) {
-    const opts = options ?? {};
-    this.autoResize = !!opts.autoResize;
-    this.shelves = [];
-    this.freebins = [];
-    this.stats = {};
-    this.bins = {};
-    this.maxId = 0;
-    this.width = width;
-    this.height = height;
+    this.maxId = maxId;
   }
 
   /**
@@ -517,7 +465,7 @@ export class ShelfPack {
   incrementReferenceCount(bin: Bin): number {
     if (++bin.refcount === 1) {
       // A new Bin. record height in stats histogram.
-      this.stats[bin.height] = (this.stats[bin.height] | 0) + 1;
+      this.stats[bin.height] = (this.stats[bin.height] ?? 0) + 1;
     }
 
     return bin.refcount;

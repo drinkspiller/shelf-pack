@@ -9,14 +9,14 @@
  *
  * Imagine a ShelfPack instance as managing a physical bookshelf:
  *
- *     - `ShelfPack` instance: entire bookshelf.
- *     - `this.shelves`: The horizontal shelves on the bookshelf.
- *     - `Bin` objects: The rectangular items (e.g., books) being placed on the
+ *   - `ShelfPack` instance: entire bookshelf.
+ *   - `this.shelves`: The horizontal shelves on the bookshelf.
+ *   - `Bin` objects: The rectangular items (e.g., books) being placed on the
  *        shelves.
- *     - `this.freebins`: A box of "available" books that have been removed
- *        from the shelf and can be reused.
- *     - `this.bins`: A record of all the books currently placed on the
- *        bookshelf, and how many times each has been requested.
+ *   - `this.freebins`: Available spots on a shelf where a removed book used to
+ *      be and can be reused.
+ *   - `this.bins`: A record of all the books currently placed on the
+ *      bookshelf, and how many times each has been requested.
  *
  * # Core Concepts:
  *
@@ -112,13 +112,14 @@ var Shelf = /** @class */ (function () {
      * @param height Height of the shelf.
      * @param x The initial X position on the shelf
      */
-    function Shelf(y, width, height, x) {
+    function Shelf(y, width, height, x, free) {
         if (x === void 0) { x = 0; }
+        if (free === void 0) { free = width; }
         this.y = y;
         this.width = width;
         this.height = height;
         this.x = x;
-        this.free = width;
+        this.free = free;
     }
     /**
      * Attempts to allocate a bin on this shelf.
@@ -156,18 +157,24 @@ var ShelfPack = /** @class */ (function () {
      * @param height Initial height of the packer.
      * @param options Optional configuration options.
      */
-    function ShelfPack(width, height, options) {
+    function ShelfPack(width, height, options, shelves, freebins, stats, bins, autoResize, maxId) {
         if (width === void 0) { width = 64; }
         if (height === void 0) { height = 64; }
-        var opts = options !== null && options !== void 0 ? options : {};
-        this.autoResize = !!opts.autoResize;
-        this.shelves = [];
-        this.freebins = [];
-        this.stats = {};
-        this.bins = {};
-        this.maxId = 0;
+        if (shelves === void 0) { shelves = []; }
+        if (freebins === void 0) { freebins = []; }
+        if (stats === void 0) { stats = {}; }
+        if (bins === void 0) { bins = {}; }
+        if (autoResize === void 0) { autoResize = !!(options === null || options === void 0 ? void 0 : options.autoResize); }
+        if (maxId === void 0) { maxId = 0; }
         this.width = width;
         this.height = height;
+        this.options = options;
+        this.shelves = shelves;
+        this.freebins = freebins;
+        this.stats = stats;
+        this.bins = bins;
+        this.autoResize = autoResize;
+        this.maxId = maxId;
     }
     /**
      * Packs multiple bins into the packer.
@@ -382,9 +389,10 @@ var ShelfPack = /** @class */ (function () {
      * @returns The new reference count of the bin.
      */
     ShelfPack.prototype.incrementReferenceCount = function (bin) {
+        var _a;
         if (++bin.refcount === 1) {
             // A new Bin. record height in stats histogram.
-            this.stats[bin.height] = (this.stats[bin.height] | 0) + 1;
+            this.stats[bin.height] = ((_a = this.stats[bin.height]) !== null && _a !== void 0 ? _a : 0) + 1;
         }
         return bin.refcount;
     };
