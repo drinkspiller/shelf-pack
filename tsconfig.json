@@ -7,6 +7,9 @@
     "src/**/*.ts",
     "test/**/*.ts"
   ],
+  "typeRoots": [
+    "dist/**/*.d.ts"
+  ],
   "noImplicitOverride": true,
   "noPropertyAccessFromIndexSignature": true,
   "noImplicitReturns": true,
@@ -16,13 +19,20 @@
   "sourceMap": true,
   "declaration": true,
   "experimentalDecorators": true,
-  "moduleResolution": "bundler",
+  "moduleResolution": "node",
   "importHelpers": true,
-  "target": "ES2022",
+  "target": "es5",
   "module": "ES2022",
   "useDefineForClassFields": false,
   "lib": [
     "ES2022",
     "dom"
-  ]
+  ],
+  "rootDirs": [
+    "src",
+    "dist",
+  ],
+  "baseUrl": ".",
+  "allowSyntheticDefaultImports": true,
+  "strict": true,
 }
