@@ -216,13 +216,13 @@ var ShelfPack = /** @class */ (function () {
             var w = binsCopy[i].w || binsCopy[i].w;
             var h = binsCopy[i].h || binsCopy[i].h;
             var id = binsCopy[i].id;
-            if (typeof w === 'number' && typeof h === 'number') {
+            if (typeof w === "number" && typeof h === "number") {
                 var allocation = this.packOne(w, h, id);
                 if (!allocation) {
                     continue;
                 }
                 if (options.inPlace) {
-                    if ('x' in binsCopy[i] && 'y' in binsCopy[i]) {
+                    if ("x" in binsCopy[i] && "y" in binsCopy[i]) {
                         var bin = bins[i];
                         bin.x = allocation.x;
                         bin.y = allocation.y;
@@ -255,7 +255,7 @@ var ShelfPack = /** @class */ (function () {
         var i;
         var finalId;
         // If id was supplied, attempt a lookup..
-        if (typeof id === 'string' || typeof id === 'number') {
+        if (typeof id === "string" || typeof id === "number") {
             bin = this.getBin(id);
             if (bin) {
                 // We packed this bin already.
@@ -373,7 +373,7 @@ var ShelfPack = /** @class */ (function () {
         var shelf = this.shelves[index];
         var bin = shelf.alloc(w, h, id);
         if (bin === null) {
-            throw new Error('Failed to allocate bin on shelf.');
+            throw new Error("Failed to allocate bin on shelf.");
         }
         this.bins[id] = bin;
         this.ref(bin);

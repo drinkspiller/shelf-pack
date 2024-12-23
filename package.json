@@ -44,28 +44,36 @@
     "rollup-plugin-copy": "^3.5.0",
     "tap": "^21.0.1",
     "tslib": "^2.8.1",
-    "typescript": "^5.6.3"
+    "typescript": "^5.6.3",
+    "yalc": "^1.0.0-pre.53"
   },
   "engines": {
     "node": ">=6.0.0"
   },
   "scripts": {
     "bench": "npm run build && node bench/bench.js",
-    "build": "npm run generate-types; npx rollup -c rollup.config.mjs",
-    "dev": "npx nodemon rollup -c rollup.config.mjs",
+    "build": "npx rollup -c rollup.config.mjs",
+    "dev": "npx rollup -c rollup.config.mjs  --watch --watch.onEnd=\"yalc push --sig --changed\"",
     "generate-types": "npx tsc --emitDeclarationOnly --outDir dist --declaration true src/index.ts",
     "lint": "npx eslint .",
     "fix": "npx eslint . --fix",
     "test": "npm run build && npm run lint && tap --cov test/*.js",
     "compile": "tsc",
     "prepare": "npm run compile",
-    "prebuild": "rm -rf dist/*",
-    "predev": "rm -rf dist/*",
+    "prebuild": "rm -rf dist/* /Users/skyebot/Documents/shelf-pack-ts/.rollup.cache && npm run generate-types;",
+    "predev": "npm run prebuild",
     "pretest": "npm run compile",
     "posttest": "npm run lint"
   },
-  "files": [
-    "dist",
-    "src"
-  ]
+  "exports": {
+    "./package.json": {
+      "default": "./package.json"
+    },
+    ".": {
+      "types": "./dist/index.d.ts",
+      "esm2022": "./dist/shelf-pack.esm.js",
+      "esm": "./dist/shelf-pack.esm.js",
+      "default": "./dist/shelf-pack.esm.js"
+    }
+  }
 }

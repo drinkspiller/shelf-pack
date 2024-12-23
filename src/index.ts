@@ -91,7 +91,7 @@ interface BinInput {
   id?: string | number;
 }
 
-type InputBin<T extends {inPlace?: boolean}> = T['inPlace'] extends true
+type InputBin<T extends { inPlace?: boolean }> = T["inPlace"] extends true
   ? Bin // If inPlace is true, require Bin type
   : BinInput; // Otherwise, allow BinInput type
 
@@ -256,7 +256,7 @@ class ShelfPack {
    * @param options.inPlace If true, modifies the input `bins` array in-place, adding `x`, `y`, and `id` properties to each bin.
    * @returns An array of packed Bins.
    */
-  pack<T extends {inPlace?: boolean}>(
+  pack<T extends { inPlace?: boolean }>(
     bins: InputBin<T>[],
     options: T = {} as T,
   ): Bin[] {
@@ -269,13 +269,13 @@ class ShelfPack {
       const h = binsCopy[i].h || binsCopy[i].h;
       const id = binsCopy[i].id;
 
-      if (typeof w === 'number' && typeof h === 'number') {
+      if (typeof w === "number" && typeof h === "number") {
         const allocation = this.packOne(w, h, id);
         if (!allocation) {
           continue;
         }
         if (options.inPlace) {
-          if ('x' in binsCopy[i] && 'y' in binsCopy[i]) {
+          if ("x" in binsCopy[i] && "y" in binsCopy[i]) {
             const bin = bins[i] as Bin;
             bin.x = allocation.x;
             bin.y = allocation.y;
@@ -299,7 +299,7 @@ class ShelfPack {
    * @returns The packed Bin, or null if the bin could not be packed.
    */
   packOne(w: number, h: number, id?: string | number): Bin | null {
-    const best: {freebin: number; shelf: number; waste: number} = {
+    const best: { freebin: number; shelf: number; waste: number } = {
       freebin: -1,
       shelf: -1,
       waste: Infinity,
@@ -312,7 +312,7 @@ class ShelfPack {
     let finalId: string | number;
 
     // If id was supplied, attempt a lookup..
-    if (typeof id === 'string' || typeof id === 'number') {
+    if (typeof id === "string" || typeof id === "number") {
       bin = this.getBin(id);
       if (bin) {
         // We packed this bin already.
@@ -453,7 +453,7 @@ class ShelfPack {
     const shelf = this.shelves[index];
     const bin = shelf.alloc(w, h, id);
     if (bin === null) {
-      throw new Error('Failed to allocate bin on shelf.');
+      throw new Error("Failed to allocate bin on shelf.");
     }
     this.bins[id] = bin;
     this.ref(bin);

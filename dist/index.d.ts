@@ -90,7 +90,7 @@ interface BinInput {
 }
 type InputBin<T extends {
     inPlace?: boolean;
-}> = T['inPlace'] extends true ? Bin : BinInput;
+}> = T["inPlace"] extends true ? Bin : BinInput;
 /**
  * Represents a rectangular area within the packer.
  */
